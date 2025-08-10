@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lista</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 15px;
+    background: linear-gradient(135deg, #232526, #1c1c1c);
+    color: #ddd;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  #ordenar-btn {
+    display: block;
+    margin: 10px auto 20px;
+    padding: 8px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background: #2980b9;
+    color: white;
+    transition: background-color 0.4s;
+  }
+  #ordenar-btn:hover {
+    background: #2471a3;
+  }
+
+  #input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  #novo-item {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #3a3b3c;
+    color: #ddd;
+    transition: border-color 0.4s, background-color 0.4s, color 0.4s;
+  }
+
+  #btn-add {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background: #2980b9;
+    color: white;
+    transition: background-color 0.4s;
+  }
+  #btn-add:hover {
+    background: #2471a3;
+  }
+
+  #format-buttons {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  #format-buttons button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background: #3a3b3c;
+    color: #ddd;
+    transition: background-color 0.4s, border-color 0.4s, color 0.4s;
+  }
+  #format-buttons button:hover {
+    background-color: #506d9f;
+  }
+
+  ul#lista-compras {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  ul#lista-compras li {
+    padding: 10px 12px;
+    border: 1px solid #444;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #2c2f33, #23272a);
+    box-shadow: none;
+    color: #ddd;
+  }
+
+  ul#lista-compras li span.texto {
+    flex: 1;
+    outline: none;
+    cursor: text;
+    color: #ddd;
+    user-select: text;
+  }
+
+  ul#lista-compras li span.texto[contenteditable="true"] {
+    border-bottom: 1px dashed #888;
+  }
+
+  ul#lista-compras li.completed span.texto {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  ul#lista-compras li button.remove-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  ul#lista-compras li button.remove-btn:hover {
+    background: #c0392b;
+  }
+
+  ul#lista-compras li input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  #excluir-todos-btn {
+    display: block;
+    margin: 0 auto 30px;
+    padding: 8px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background: #c0392b;
+    color: white;
+    transition: background-color 0.4s;
+  }
+
+  #excluir-todos-btn:hover {
+    background: #a93226;
+  }
+</style>
+</head>
+<body>
+
+<h1>Lista</h1>
+
+<button id="ordenar-btn">Ordenar alfabeticamente</button>
+
+<div id="input-area">
+  <input type="text" id="novo-item" placeholder="Digite um novo item" />
+  <button id="btn-add">Adicionar</button>
+</div>
+
+<div id="format-buttons">
+  <button id="bold-btn" title="Negrito"><b>B</b></button>
+  <button id="italic-btn" title="Itálico"><i>I</i></button>
+  <button id="upper-btn" title="Maiúsculas">AA</button>
+  <button id="lower-btn" title="Minúsculas">aa</button>
+</div>
+
+<ul id="lista-compras">
+  <!-- itens vão aparecer aqui -->
+</ul>
+
+<button id="excluir-todos-btn">Excluir todos</button>
+
+<script>
+  const novoItemInput = document.getElementById('novo-item');
+  const btnAdd = document.getElementById('btn-add');
+  const lista = document.getElementById('lista-compras');
+  const ordenarBtn = document.getElementById('ordenar-btn');
+  const excluirTodosBtn = document.getElementById('excluir-todos-btn');
+
+  const boldBtn = document.getElementById('bold-btn');
+  const italicBtn = document.getElementById('italic-btn');
+  const upperBtn = document.getElementById('upper-btn');
+  const lowerBtn = document.getElementById('lower-btn');
+
+  function criarItem(texto) {
+    const li = document.createElement('li');
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+
+    const span = document.createElement('span');
+    span.classList.add('texto');
+    span.contentEditable = true;
+    span.textContent = texto;
+
+    const btnRemove = document.createElement('button');
+    btnRemove.classList.add('remove-btn');
+    btnRemove.textContent = 'X';
+
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        li.classList.add('completed');
+      } else {
+        li.classList.remove('completed');
+      }
+    });
+
+    btnRemove.addEventListener('click', () => {
+      li.remove();
+    });
+
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    li.appendChild(btnRemove);
+
+    span.addEventListener('click', () => {
+      span.focus();
+    });
+
+    return li;
+  }
+
+  btnAdd.addEventListener('click', () => {
+    const texto = novoItemInput.value.trim();
+    if (texto) {
+      const item = criarItem(texto);
+      lista.appendChild(item);
+      novoItemInput.value = '';
+      novoItemInput.focus();
+    }
+  });
+
+  novoItemInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      btnAdd.click();
+      e.preventDefault();
+    }
+  });
+
+  function aplicarFormatacao(tag) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    if (!range || selection.isCollapsed) return;
+
+    const el = document.createElement(tag);
+    el.appendChild(range.extractContents());
+    range.insertNode(el);
+    selection.removeAllRanges();
+  }
+
+  boldBtn.addEventListener('click', () => {
+    aplicarFormatacao('b');
+  });
+
+  italicBtn.addEventListener('click', () => {
+    aplicarFormatacao('i');
+  });
+
+  upperBtn.addEventListener('click', () => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    if (!range || selection.isCollapsed) return;
+
+    let texto = selection.toString();
+    if (!texto) return;
+
+    const maiusculo = texto.toUpperCase();
+    const span = document.createElement('span');
+    span.textContent = maiusculo;
+
+    range.deleteContents();
+    range.insertNode(span);
+    selection.removeAllRanges();
+  });
+
+  lowerBtn.addEventListener('click', () => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    if (!range || selection.isCollapsed) return;
+
+    let texto = selection.toString();
+    if (!texto) return;
+
+    const minusculo = texto.toLowerCase();
+    const span = document.createElement('span');
+    span.textContent = minusculo;
+
+    range.deleteContents();
+    range.insertNode(span);
+    selection.removeAllRanges();
+  });
+
+  ordenarBtn.addEventListener('click', () => {
+    const itens = Array.from(lista.children);
+    itens.sort((a, b) => {
+      const textoA = a.querySelector('span.texto').textContent.toLowerCase();
+      const textoB = b.querySelector('span.texto').textContent.toLowerCase();
+      return textoA.localeCompare(textoB);
+    });
+    itens.forEach(item => lista.appendChild(item));
+  });
+
+  excluirTodosBtn.addEventListener('click', () => {
+    if (confirm('Tem certeza que deseja excluir todos os itens?')) {
+      lista.innerHTML = '';
+    }
+  });
+</script>
+
+</body>
+</html>
